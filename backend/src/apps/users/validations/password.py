@@ -1,5 +1,31 @@
 from rest_framework import serializers
 from apps.users.models import User, PasswordReset
+from django.contrib.auth.hashers import check_password
+
+
+def custom_validate_password(password):
+    # TODO: Добавить валидацию перед продом
+    return password
+
+
+def custom_validate_password_login(data):
+    password = data.get('password')
+    email = data.get('email')
+    username = data.get('username')
+
+    if not password:
+        raise serializers.ValidationError({"password": "Пожалуйста, введите ваш пароль."})
+
+    if email:
+        user = User.objects.filter(email=email).first()
+        if user and not check_password(password, user.password):
+            raise serializers.ValidationError({"password": "Неверный пароль."})
+
+    if username:
+        user = User.objects.filter(username=username).first()
+        if user and not check_password(password, user.password):
+            raise serializers.ValidationError({'password': 'Неверный пароль'})
+
 
 
 # Валидация запроса сброса пароля

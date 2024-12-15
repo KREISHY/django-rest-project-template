@@ -1,6 +1,7 @@
 import re
 from rest_framework import serializers
 from apps.users.models import User
+from .password import custom_validate_password_login
 
 
 def custom_validate_email(email):
@@ -12,11 +13,6 @@ def custom_validate_email(email):
     if domain in forbidden_domains:
         raise serializers.ValidationError({'email': 'Использование этих почтовых сервисов запрещено.'})
     return email
-
-
-def custom_validate_password(password):
-    # TODO: Добавить валидацию перед продом
-    return password
 
 
 def custom_validate_first_name(first_name):
@@ -64,3 +60,22 @@ def custom_validate_register(data):
     patronymic = data.get('patronymic')
     if patronymic:
         custom_validate_patronymic(patronymic)
+
+
+def custom_validate_user_login(data):
+    custom_validate_password_login(data)
+
+    if data.get('email'):
+        custom_validate_email_login(data)
+
+    if data.get('username'):
+        custom_validate_username_login(data.get('username'))
+
+def custom_validate_email_login(data):
+    email = data.get('email')
+    if not email:
+        raise serializers.ValidationError({"email": "Пожалуйста, введите вашу почту."})
+
+    user = User.objects.filter(email=email).first()
+    if not user:
+        raise serializers.ValidationError({"email": "Пользователь с такой почтой не найден."})
