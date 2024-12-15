@@ -1,7 +1,7 @@
 import re
 from rest_framework import serializers
 from apps.users.models import User
-from .password import custom_validate_password_login
+from .password import custom_validate_password_login, custom_validate_password
 
 
 def custom_validate_email(email):
@@ -31,6 +31,11 @@ def custom_validate_patronymic(patronymic):
     if not re.match(r"^[а-яА-ЯёЁa-zA-Z]+$", patronymic):
         raise serializers.ValidationError({'patronymic': 'Отчество должно содержать только буквы.'})
     return patronymic
+
+
+def custom_validate_username_login(username):
+    if not User.objects.filter(username=username).exists():
+        raise serializers.ValidationError({'username': 'Данное имя пользователя не существует.'})
 
 
 # Валидация регистрации
@@ -70,6 +75,7 @@ def custom_validate_user_login(data):
 
     if data.get('username'):
         custom_validate_username_login(data.get('username'))
+
 
 def custom_validate_email_login(data):
     email = data.get('email')

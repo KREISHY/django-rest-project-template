@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-from apps.users.validations.user import custom_validate_user_login
+from apps.users.validations.user import custom_validate_user_login, custom_validate_email_login
 from config import URL_EMAIL_VERIFY, ROOT_URL, URL_USERS_API, URL_PASSWORD_RESET_VERIFY
 from apps.users.models import User, EmailVerify, PasswordReset
 from utils import generate_random_password, generate_uuid
@@ -28,9 +28,23 @@ class UserLoginByEmailSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = ['email', 'password']
+        # extra_kwargs = {
+        #     "email": {
+        #         "error_messages": {
+        #             'blank': 'Пожалуйста, укажите почту пользователя.',
+        #             'required': 'Пожалуйста, укажите почту пользователя.',
+        #         }
+        #     },
+        #     'password': {
+        #         'error_messages': {
+        #             'blank': 'Пожалуйста, укажите пароль пользователя.',
+        #             'required': 'Пожалуйста, укажите пароль пользователя.',
+        #         },
+        #     }
+        # }
 
     def validate(self, data):
-        custom_validate_user_login(data)
+        custom_validate_email_login(data)
         return data
 
 
@@ -48,29 +62,23 @@ class UserLoginByUsernameSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'password']
+        extra_kwargs = {
+            "username": {
+                "error_messages": {
+                    'blank': 'Пожалуйста, укажите имя пользователя.',
+                    'required': 'Пожалуйста, укажите имя пользователя.',
+                }
+            },
+            'password': {
+                'error_messages': {
+                    'blank': 'Пожалуйста, укажите пароль пользователя.',
+                    'required': 'Пожалуйста, укажите пароль пользователя.',
+                },
+            }
+        }
 
     def validate(self, data):
         custom_validate_user_login(data)
         return data
 
 
-class UserLoginByUsernameSerializer(ModelSerializer):
-    username = serializers.CharField(required=True, error_messages={
-        "required": "Пожалуйста, напишите имя пользователя.",
-        "blank": "Пожалуйста, напишите имя пользователя.",
-    })
-
-    password = serializers.CharField(write_only=True, required=True, error_messages={
-        "required": "Пожалуйста, напишите ваш пароль.",
-        "blank": "Пожалуйста, напишите ваш пароль.",
-    })
-
-
-    class Meta:
-        model = User
-        fields = ['username', 'password']
-
-
-    def validate(self, data):
-        custom_validate_user_login(data)
-        return data
