@@ -8,6 +8,10 @@ from api.user_api.views.registration import (
     UserRegistrationModelViewSet,
     EmailTokenConfirmationView,
 )
+from api.user_api.views.reset_password import (
+    ResetPasswordConfirmationView,
+    ResetPasswordRequestView,
+)
 from config.config import (
     URL_EMAIL_VERIFY, URL_PASSWORD_RESET_VERIFY,
 )
@@ -22,6 +26,8 @@ router.register(r'current-user', CurrentUserViewSet, basename='current-user')
 router.register(r'logout', UserLogoutViewSet, basename='logout')
 router.register(r'register', UserRegistrationModelViewSet, basename='register')
 router.register(email_verify_url, EmailTokenConfirmationView, basename=email_verify_url)
+router.register(r'password-reset-create', ResetPasswordRequestView, basename='password-reset-create')
+router.register(password_reset_confirm_url, ResetPasswordConfirmationView, basename=password_reset_confirm_url)
 
 
 urlpatterns = []
