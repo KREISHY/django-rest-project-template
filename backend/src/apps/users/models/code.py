@@ -36,5 +36,20 @@ class PasswordReset(models.Model):
         return timezone.now() > self.created_date + expiration_time
 
     class Meta:
-        verbose_name = "Токен-сброс почты"
-        verbose_name_plural = "Токены-сброса почты"
+        verbose_name = "Токен-сброс пароля"
+        verbose_name_plural = "Токены-сброса паролей"
+
+
+class EmailReset(models.Model):
+    email = models.EmailField(unique=True)
+    code = models.IntegerField(default=generate_random_code)
+    url = models.CharField(default=generate_uuid, editable=False, max_length=36)
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    def is_expired(self) -> bool:
+        expiration_time = timedelta(hours=EMAIL_VERIFY_TOKEN_LIFETIME)
+        return timezone.now() > self.created_date + expiration_time
+
+    class Meta:
+        verbose_name = 'Токен-сброс почты'
+        verbose_name_plural = 'Токены-сброса почты'

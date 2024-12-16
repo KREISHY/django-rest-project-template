@@ -145,6 +145,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # UserModel
 AUTH_USER_MODEL = "users.User"
 
+LOGIN_URL = 'login'
+
 # REST
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
@@ -155,7 +157,6 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.JSONParser',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [

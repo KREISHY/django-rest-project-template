@@ -15,6 +15,7 @@ from .email import (
 from .password import (
     custom_validate_reset_request_password,
     custom_validate_reset_verify_password,
+    custom_validate_reset_verify_email,
     custom_validate_password,
     custom_validate_password_login,
 )
