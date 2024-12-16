@@ -6,16 +6,16 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
 from apps.users.validations.user import custom_validate_user_login
-from config import URL_EMAIL_VERIFY, ROOT_URL, URL_USERS_API, URL_PASSWORD_RESET_VERIFY
-from apps.users.models import User, EmailVerify, PasswordReset
+from config import URL_EMAIL_VERIFY, ROOT_URL, URL_USERS_API, URL_EMAIL_RESET_VERIFY
+from apps.users.models import User, EmailVerify, PasswordReset, EmailReset
 from utils import generate_random_password, generate_uuid
 from apps.users.validations import custom_validate_register, custom_validate_token, \
-    custom_validate_reset_request_password, custom_validate_reset_verify_password
+    custom_validate_reset_request_password, custom_validate_reset_verify_email
 
 
-class PasswordResetRequestSerializer(serializers.ModelSerializer):
+class EmailResetRequestSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PasswordReset
+        model = EmailReset
         fields = ['email']
         extra_kwargs = {
             "email": {
@@ -29,11 +29,11 @@ class PasswordResetRequestSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        PasswordReset.objects.filter(email=validated_data['email']).delete()
-        reset_token = PasswordReset.objects.create(email=validated_data['email'])
+        EmailReset.objects.filter(email=validated_data['email']).delete()
+        reset_token = EmailReset.objects.create(email=validated_data['email'])
         EmailMessage(
             'Сброс пароля',
-            f'URL: {ROOT_URL + URL_USERS_API + URL_PASSWORD_RESET_VERIFY}{reset_token.url}\n{reset_token.code}',
+            f'URL: {ROOT_URL + URL_USERS_API + URL_EMAIL_RESET_VERIFY}{reset_token.url}\n{reset_token.code}',
             to=[reset_token.email]
         ).send()
         return reset_token
@@ -43,15 +43,15 @@ class PasswordResetRequestSerializer(serializers.ModelSerializer):
         return data
 
 
-class PasswordResetVerifySerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True, error_messages={
-        "required": "Пожалуйста, напишите свой пароль.",
-        "blank": "Пожалуйста, напишите свой пароль."
+class EmailResetVerifySerializer(serializers.ModelSerializer):
+    email = serializers.CharField(write_only=True, required=True, error_messages={
+        "required": "Пожалуйста, напишите свою почту.",
+        "blank": "Пожалуйста, напишите свою почту."
     })
 
     class Meta:
-        model = PasswordReset
-        fields = ['code', 'password']
+        model = EmailReset
+        fields = ['code', 'email']
         extra_kwargs = {
             "code": {
                 "error_messages": {
@@ -63,13 +63,13 @@ class PasswordResetVerifySerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         url = self.context.get('url')
-        custom_validate_reset_verify_password(data, url)
+        custom_validate_reset_verify_email(data, url)
         return data
 
     def create(self, validated_data):
-        reset = get_object_or_404(PasswordReset, url=validated_data['url'])
+        reset = get_object_or_404(EmailReset, url=validated_data['url'])
         user = get_object_or_404(User, email=reset.email)
-        user.set_password(validated_data['password'])
+        user.email = validated_data['email']
         user.save()
         reset.delete()
         return user
