@@ -43,7 +43,7 @@ class UserRegistrationsSerializer(serializers.ModelSerializer):
             first_name=validated_data.get('first_name', ''),
             patronymic=validated_data.get('patronymic', ''),
             is_active=False,
-            username= validated_data.get('username', ''),
+            username=validated_data.get('username', ''),
         )
         token = EmailVerify.objects.create(user=user)
         EmailMessage(
@@ -56,4 +56,3 @@ class UserRegistrationsSerializer(serializers.ModelSerializer):
     def validate(self, data):
         custom_validate_register(data)
         return data
-

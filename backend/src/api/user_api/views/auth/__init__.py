@@ -7,3 +7,6 @@ from .current_user import (
 from .logout import (
     UserLogoutViewSet,
 )
+from .registration import (
+    UserRegistrationModelViewSet,
+)
