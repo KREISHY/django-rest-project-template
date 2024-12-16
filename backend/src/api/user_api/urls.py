@@ -2,13 +2,18 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 from api.user_api.views.auth import (
     LoginByEmailViewSet, CurrentUserViewSet,
-    UserLogoutViewSet, UserRegistrationModelViewSet,
+    UserLogoutViewSet,
+)
+from api.user_api.views.registration import (
+    UserRegistrationModelViewSet,
     EmailTokenConfirmationView,
 )
 from config.config import (
     URL_EMAIL_VERIFY, URL_PASSWORD_RESET_VERIFY,
 )
+
 email_verify_url = URL_EMAIL_VERIFY.replace("/", "")
+password_reset_confirm_url = URL_PASSWORD_RESET_VERIFY.replace("/", "")
 
 
 router = DefaultRouter()

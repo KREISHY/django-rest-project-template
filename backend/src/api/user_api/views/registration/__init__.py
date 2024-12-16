@@ -1,0 +1,2 @@
+from .registration import UserRegistrationModelViewSet
+from .registration_email_confirm_token import EmailTokenConfirmationView
